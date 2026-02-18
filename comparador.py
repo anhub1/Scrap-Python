@@ -11,6 +11,7 @@ from utils import extraer_menu, comparar_menu
 from utils import extraer_busqueda, comparar_busqueda
 from utils import imagen, comparar_imagenes
 from utils import extraer_referencias, comparar_referencias
+from utils import extraer_garantia, comparar_garantia
 
 
 
@@ -47,6 +48,9 @@ def comparar_webs(url_prod, url_dev, termino_busqueda):
         
         # -------------------------REFERENCIAS------------------------ 
         ref_prod = extraer_referencias(soup_prod, es_dev=False)
+        
+        # -------------------------GARANTIA------------------------ 
+        gar_prod = extraer_garantia(soup_prod, es_dev=False)
 
 
         # --------------------ETIM   TABLA--------------------
@@ -114,6 +118,10 @@ def comparar_webs(url_prod, url_dev, termino_busqueda):
         # -------------------------REFERENCIAS------------------------ 
         ref_dev = extraer_referencias(soup_dev, es_dev=True)
         
+        # -------------------------GARANTIA------------------------ 
+        gar_dev = extraer_garantia(soup_dev, es_dev=True)
+        
+        
         # --------------------ETIM   TABLA---------------------------
         etim_dev = extraer_etim(soup_dev, es_dev=True)
         
@@ -177,6 +185,9 @@ def comparar_webs(url_prod, url_dev, termino_busqueda):
         
         # ------------------- COMPARACIÓN DE REFERENCIAS ----------------------------
         lista_referencias = comparar_referencias(ref_prod, ref_dev)
+        
+        # ------------------- COMPARACIÓN DE GARANTIA ----------------------------
+        lista_garantia = comparar_garantia(gar_prod, gar_dev)
 
         # ------------------- COMPARACIÓN ETIM ----------------------------
         lista_etim = comparar_etim(etim_prod, etim_dev)
@@ -204,6 +215,7 @@ def comparar_webs(url_prod, url_dev, termino_busqueda):
             "breadcrumb": {"prod": breadcrumb_prod, "dev": breadcrumb_dev},
             "categorias": lista_categorias,
             "referencias": lista_referencias,
+            "garantia": lista_garantia,
             "etim": lista_etim,
             "caja": lista_compra,
             "menu": lista_menu,

@@ -1,6 +1,13 @@
 # Scrap-Python
 Proyecto scrap varias URL de productos EAN
 
+### [V1.0.2] Garantía Enlace - 2026-2-18
+- **Pruebas:** ✅ Todo ok.
+- **Pruebas:** ✅ Mostrar enlace de garantía y su link.
+- **Función:** Modificar función  `referencias`.
+- **Función:** Crear función  `garantia`.
+- **HTML:** Visualizar  `enlace garantía`.
+
 
 ### [V1.0.1] Referencias - 2026-2-18
 - **Pruebas:** ✅ Todo ok.

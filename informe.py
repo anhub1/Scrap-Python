@@ -212,6 +212,38 @@ def generar_html(datos):
                 </tbody>
             </table>
 
+            <h2>Enlace Garantía, reparación y devolución</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Índice</th>
+                        <th>PROD (Texto)</th>
+                        <th>DEV (Texto)</th>
+                        <th>PROD (Enlace)</th>
+                        <th>DEV (Enlace)</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>"""
+
+    for item in datos['garantia']:
+        clase = "ok" if "✅" in item['estado'] else "error"
+                
+        html += f"""
+                    <tr>
+                        <td>{item['indice']}</td>
+                        <td>{item['texto_p']}</td>
+                        <td>{item['texto_d']}</td>
+                        <td style="font-size: 0.8em; color: #666; max-width: 200px; word-break: break-all;">{item['url_p']}</td>
+                        <td style="font-size: 0.8em; color: #666; max-width: 200px; word-break: break-all;">{item['url_d']}</td>
+                        <td class="{clase}">{item['estado']}</td>
+                    </tr>"""       
+
+    html += """
+                </tbody>
+            </table>
+
+
             <h2>Características Técnicas (ETIM)</h2>
             <table>
                 <thead>
