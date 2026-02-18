@@ -158,6 +158,34 @@ def generar_html(datos):
                 </tbody>
             </table>
 
+            <h2>Referencias, Fabricante y Descripción corta y larga</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Índice</th>
+                        <th>Producción</th>
+                        <th>Desarrollo</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>"""
+    
+    for item in datos['referencias']:
+        clase = "ok" if "✅" in item['estado'] else "error"
+        html += f"""
+                    <tr>
+                        <td>{item['indice']}</td>
+                        <td>{item['prod']}</td>
+                        <td>{item['dev']}</td>
+                        <td class="{clase}">{item['estado']}</td>
+                    </tr>"""
+
+    html += """
+                </tbody>
+            </table>
+
+
+
             <h2>Categorías </h2>
             <table>
                 <thead>

@@ -6,7 +6,7 @@ from urllib.parse import urlparse, parse_qs, unquote
 def extraer_categorias(soup, es_dev=False):
     if not es_dev:
         # ----------------------- PROD -------------------------------------
-        datos_cat = []                                                                             # Lista
+        datos = []                                                                             # Lista
 
         menu_prod = soup.find('div', class_='mobile-cat')
 
@@ -18,11 +18,11 @@ def extraer_categorias(soup, es_dev=False):
                     label.decompose()                                   # eliminamos el <label> si existe (Esto quita la palabra "Categorias:" de la extracción)
                 texto = p.get_text(strip=True)                          # Sacamos el texto restante (que será el span o el texto suelto)
                 if texto:
-                    datos_cat.append(texto)
+                    datos.append(texto)
             
     else:
         # ----------------------- DEV -------------------------------------
-        datos_cat = []                                                                              # Lista
+        datos = []                                                                              # Lista
        
         menu_dev = soup.find("ul", class_="list-disc")
 
@@ -32,26 +32,24 @@ def extraer_categorias(soup, es_dev=False):
                 texto = li.get_text(strip=True)
                 #print(f"Texto DEV: {texto}")
                 if texto:
-                    datos_cat.append(texto)
+                    datos.append(texto)
 
-    return {
-        "cantidad": len(datos_cat),
-        "nombres": datos_cat
-    }
+    return datos
 
 
 def comparar_categorias(cat_prod, cat_dev):
     print("\n----------------- COMPARACIÓN DE CATEGORÍAS ------------------")
     resultados_cat = []
-    max_cat = max(cat_prod["cantidad"], cat_dev["cantidad"])    # Hay que coger la categoría con más filas 
     
-    if cat_prod["cantidad"] == cat_dev["cantidad"]:                           # Número de categorías en este producto
-        print(f"✅ Mismo nº categorías ({cat_prod["cantidad"]}).")
+    if len(cat_prod) == len(cat_dev):                           # Número de categorías en este producto
+        print(f"✅ Mismo nº categorías ({len(cat_prod)}).")
     else:
-        print(f"❌ Diferente nº categorías: Prod tiene {cat_prod["cantidad"]} y Dev tiene {cat_dev["cantidad"]}.")
+        print(f"❌ Diferente nº categorías: Prod tiene {len(cat_prod)} y Dev tiene {len(cat_dev)}.")
     
-    cant_p = cat_prod["cantidad"]
-    cant_d = cat_dev["cantidad"]
+    cant_p = len(cat_prod)
+    cant_d = len(cat_dev)
+
+    max_cat = max(cant_p, cant_d)   # Hay que coger la categoría con más filas
     
     if cant_p == cant_d:
         estado = "✅ OK"
@@ -68,8 +66,8 @@ def comparar_categorias(cat_prod, cat_dev):
 
     print("\n----------------- COMPARACIÓN DETALLADA CATEGORÍAS -----------------")
     
-    nombres_p = cat_prod["nombres"]        # Si pongo: [:5] => Máximo 5 para comparar
-    nombres_d = cat_dev["nombres"]
+    nombres_p = cat_prod        # Si pongo: [:5] => Máximo 5 para comparar
+    nombres_d = cat_dev
     
     for i in range(max_cat):                                    # Recorrer hasta el nº máx de categorías
         if i < cant_p:                                   # Cat dentro de Producción
@@ -146,24 +144,22 @@ def extraer_menu(soup, es_dev=False):
                         "url": enlace_url
                     })
 
-    return {
-        "cantidad": len(datos_menu),
-        "nombres": datos_menu
-    }
+    return datos_menu
 
 def comparar_menu(menu_prod, menu_dev):
     print("\n----------------- COMPARACIÓN DE MENÚ ------------------------")
     resultados_menu = []
-    max_cat = max(menu_prod["cantidad"], menu_dev["cantidad"])    # Hay que coger la categoría con más filas 
     
-    
-    if menu_prod["cantidad"] == menu_dev["cantidad"]:
-        print(f"✅ Mismo Nº de elementos ({menu_prod["cantidad"]}).")
+    if len(menu_prod) == len(menu_dev): 
+        print(f"✅ Mismo Nº de elementos ({len(menu_prod)}).")
     else:
-        print(f"❌ Diferencia: Prod tiene {menu_prod["cantidad"]} y Dev tiene {menu_dev["cantidad"]}.")
+        print(f"❌ Diferencia: Prod tiene {len(menu_prod)} y Dev tiene {len(menu_dev)}.")
         
-    cant_p = menu_prod["cantidad"]
-    cant_d = menu_dev["cantidad"]
+    cant_p = len(menu_prod)
+    cant_d = len(menu_dev)
+
+    max_menu = max(cant_p, cant_d)   # Hay que coger la categoría con más filas
+    
     
     if cant_p == cant_d:
         estado = "✅ OK"
@@ -180,11 +176,11 @@ def comparar_menu(menu_prod, menu_dev):
         })    
     #-----------------------------------------------------------------------
     
-    nombres_p = menu_prod["nombres"]        # Si pongo: [:5] => Máximo 5 para comparar
-    nombres_d = menu_dev["nombres"]
+    nombres_p = menu_prod        # Si pongo: [:5] => Máximo 5 para comparar
+    nombres_d = menu_dev
     
-    for i in range(max_cat):                      # Usamos el largo de PROD para iterar (fila a fila)
-        if i < len(nombres_p):
+    for i in range(max_menu):                      # Usamos el largo de PROD para iterar (fila a fila)
+        if i < cant_p:
             info_p = nombres_p[i]
             texto_p = str(info_p.get("texto", "N/A")).strip()
             url_p = str(info_p.get('url', 'N/A')).strip()
@@ -192,7 +188,7 @@ def comparar_menu(menu_prod, menu_dev):
             texto_p = "N/A"
             url_p = "N/A"
             
-        if i < len(nombres_d):
+        if i < cant_d:
             info_d = nombres_d[i]
             texto_d = str(info_d.get("texto", "N/A")).strip()
             url_d = str(info_d.get('url', 'N/A')).strip()
@@ -223,6 +219,121 @@ def comparar_menu(menu_prod, menu_dev):
         """
     return resultados_menu
 
+
+# ------------------------ REFERENCIA ------------------------------------------
+def extraer_referencias(soup, es_dev=False):
+    if not es_dev:
+        # ----------------------- PROD -------------------------------------
+        datos = []                                                                             # Lista
+
+        ref_prod = soup.find('p', id ='product_reference')
+        manu_prod = soup.find('p', id ='product_manufacturer')
+        desc_prod = soup.find('div', id ='short_description_block')
+        cont_prod = soup.find('p', id ='short_description_content')
+        cont_dos_prod = soup.find('p', id ='short_description_content_2')
+        garantia_prod = soup.find('ul', id ='usefull_link_block')
+
+        # Solo guardamos si existen (evitamos el "N/A" dentro de la lista)
+        if ref_prod:
+            datos.append(ref_prod.get_text(strip=True))
+        if manu_prod:
+            datos.append(manu_prod.get_text(strip=True))
+        
+        if desc_prod:
+            label = desc_prod.find('label')
+            if label:
+                datos.append(label.get_text(strip=True))
+            
+        if cont_prod:
+            datos.append(cont_prod.get_text(strip=True))
+        if cont_dos_prod:
+            datos.append(cont_dos_prod.get_text(strip=True))
+         
+            
+    else:
+        # ----------------------- DEV -------------------------------------
+        datos = []                                                                              # Lista
+       
+        ref_dev = soup.find(attrs={'data-testid':'product_reference'})
+        manu_dev = soup.find(attrs={'data-testid':'product_manufacturer'})
+        desc_dev = soup.find(attrs={'data-testid':'short_description_block'})
+        cont_dev = soup.find(attrs={'data-testid':'short_description_content'})
+
+        # Solo añadimos a la lista si el elemento NO es None
+        if ref_dev:
+            datos.append(ref_dev.get_text(strip=True))
+        if manu_dev:
+            datos.append(manu_dev.get_text(strip=True))
+        if desc_dev:
+            datos.append(desc_dev.get_text(strip=True))
+        if cont_dev:
+            datos.append(cont_dev.get_text(strip=True))
+
+    return datos
+
+
+def comparar_referencias(ref_prod, ref_dev):
+    print("\n----------------- COMPARACIÓN DE REFERENCIAS ------------------")
+    resultados_ref = []
+    
+    if len(ref_prod) == len(ref_dev):                           # Número de categorías en este producto
+        print(f"✅ Mismo nº referencias ({len(ref_prod)}).")
+    else:
+        print(f"❌ Diferente nº referencias: Prod tiene {len(ref_prod)} y Dev tiene {len(ref_dev)}.")
+    
+    cant_p = len(ref_prod)
+    cant_d = len(ref_dev)
+
+    max_ref = max(cant_p, cant_d)   # Hay que coger la categoría con más filas
+    
+    if cant_p == cant_d:
+        estado = "✅ OK"
+    else:
+        estado = "❌ ERROR"
+        
+    resultados_ref.append({                                 # Guardar en la lista
+            "indice": "TOTAL",
+            "prod": cant_p,
+            "dev": cant_d,
+            "estado": estado
+        })
+    
+
+    print("\n----------------- COMPARACIÓN DETALLADA CATEGORÍAS -----------------")
+    
+    nombres_p = ref_prod        # Si pongo: [:5] => Máximo 5 para comparar
+    nombres_d = ref_dev
+    
+    for i in range(max_ref):                                    # Recorrer hasta el nº máx de ref
+        if i < cant_p:                                   # ref dentro de Producción
+            info_p = nombres_p[i]
+        else:
+            info_p = "N/A"
+        
+        if i < cant_d:                                    # ref dentro de Desarrollo
+            info_d = nombres_d[i]
+        else:
+            info_d = "N/A"
+
+        if info_p == info_d:
+            estado = "✅ OK"
+        else:
+            estado = "❌ ERROR"
+        
+        
+        resultados_ref.append({                                 # Guardar en la lista
+            "indice": i + 1,
+            "prod": info_p,
+            "dev": info_d,
+            "estado": estado
+        })
+        """
+        print(f"{estado} | Nivel {i+1}:")
+        print(f"      Prod: {info_p}")
+        print(f"      Dev:  {info_d}")
+        print("-" * 30)
+        """
+    return resultados_ref
 
 
 
@@ -316,12 +427,12 @@ def comparar_etim(etim_prod, etim_dev):
     
     for i in range(max_etim):                                                             # Comparar fila a fila
                                                                            
-        if i < len(etim_prod):                                                                 # Coger la fila de PROD
+        if i < cant_p:                                                                 # Coger la fila de PROD
             info_p = etim_prod[i]
         else:
             info_p = {"nombre": "N/A", "valor": "N/A", "unidad": ""}
         
-        if i < len(etim_dev):                                                                   # La tabla de PROD tiene más filas de DEV
+        if i < cant_d:                                                                   # La tabla de PROD tiene más filas de DEV
             info_d = etim_dev[i]
         else:
             info_d = {"nombre": "N/A", "valor": "N/A", "unidad": ""}                            # Si ya no hay filas en DEV poner NA
@@ -529,28 +640,34 @@ def extraer_busqueda(page, termino, es_dev=False):
         #lista_nombres.append(f"{referencia} - {nombre}")   
         lista_nombres.append({
             "referencia": referencia,
-            "nombre": nombre
+            "nombre": nombre,
+            "termino": termino
             })
         
     #print(f"✅ Encontrados {len(items)} productos en {'DEV' if es_dev else 'PROD'}.")
+    """
     return {
         "cantidad": len(items),
         "nombres": lista_nombres,
         "termino": termino
     }
+    """
+    return lista_nombres
 
 def comparar_busqueda(busqueda_prod, busqueda_dev):
     print("\n----------------- COMPARACIÓN DE BÚSQUEDA ------------------------")
     resultados_busqueda = []
-    # Comprobamos la cantidad total primero
-    if busqueda_prod["cantidad"] == busqueda_dev["cantidad"]:
-        print(f"✅ Mismo nº de resultados ({busqueda_prod['cantidad']}).")
+
+    if len(busqueda_prod) == len(busqueda_dev):
+        print(f"✅ Mismo nº de resultados ({len(busqueda_prod)}).")
     else:
-        print(f"❌ Diferencia en cantidad: Prod tiene {busqueda_prod['cantidad']} y Dev tiene {busqueda_dev['cantidad']}.")
-          
-    cant_p = busqueda_prod["cantidad"]
-    cant_d = busqueda_dev["cantidad"]
+        print(f"❌ Diferencia en cantidad: Prod tiene {len(busqueda_prod)} y Dev tiene {len(busqueda_dev)}.")
     
+    cant_p = len(busqueda_prod)
+    cant_d = len(busqueda_dev)
+
+    max_busqueda = max(cant_p, cant_d)   # Hay que coger la categoría con más filas
+
     if cant_p == cant_d:
         estado = "✅ OK"
     else:
@@ -571,12 +688,11 @@ def comparar_busqueda(busqueda_prod, busqueda_dev):
     
     
    
-    nombres_p = busqueda_prod["nombres"]        # Si pongo: [:5] => Máximo 5 para comparar
-    nombres_d = busqueda_dev["nombres"]
-    max_filas = max(len(nombres_p), len(nombres_d))
+    nombres_p = busqueda_prod        # Si pongo: [:5] => Máximo 5 para comparar
+    nombres_d = busqueda_dev
     
-    for i in range(max_filas):
-        if i < len(nombres_p):
+    for i in range(max_busqueda):
+        if i < cant_p:
             info_p = nombres_p[i]
             referencia_p = info_p.get("referencia", "N/A").strip()
             nombre_p = info_p.get("nombre", "N/A").strip()
@@ -584,7 +700,7 @@ def comparar_busqueda(busqueda_prod, busqueda_dev):
             referencia_p = "N/A"
             nombre_p = "N/A"
             
-        if i < len(nombres_d):
+        if i < cant_d:
             info_d = nombres_d[i]
             referencia_d = info_d.get("referencia", "N/A").strip()
             nombre_d = info_d.get("nombre", "N/A").strip()
