@@ -12,7 +12,7 @@ from utils import extraer_busqueda, comparar_busqueda
 from utils import imagen, comparar_imagenes
 from utils import extraer_referencias, comparar_referencias
 from utils import extraer_garantia, comparar_garantia
-
+from utils import extraer_masinfo, comparar_masinfo
 
 
 def comparar_webs(url_prod, url_dev, termino_busqueda):
@@ -51,6 +51,9 @@ def comparar_webs(url_prod, url_dev, termino_busqueda):
         
         # -------------------------GARANTIA------------------------ 
         gar_prod = extraer_garantia(soup_prod, es_dev=False)
+        
+        # -------------------------MAS INFO ENLACES------------------------ 
+        masinfo_prod = extraer_masinfo(soup_prod, es_dev=False)
 
 
         # --------------------ETIM   TABLA--------------------
@@ -121,6 +124,9 @@ def comparar_webs(url_prod, url_dev, termino_busqueda):
         # -------------------------GARANTIA------------------------ 
         gar_dev = extraer_garantia(soup_dev, es_dev=True)
         
+        # -------------------------MAS INFO ENLACES------------------------ 
+        masinfo_dev = extraer_masinfo(soup_dev, es_dev=True)
+        
         
         # --------------------ETIM   TABLA---------------------------
         etim_dev = extraer_etim(soup_dev, es_dev=True)
@@ -188,6 +194,9 @@ def comparar_webs(url_prod, url_dev, termino_busqueda):
         
         # ------------------- COMPARACIÓN DE GARANTIA ----------------------------
         lista_garantia = comparar_garantia(gar_prod, gar_dev)
+        
+        # ------------------- COMPARACIÓN DE MASINFO ----------------------------
+        lista_masinfo = comparar_masinfo(masinfo_prod, masinfo_dev)
 
         # ------------------- COMPARACIÓN ETIM ----------------------------
         lista_etim = comparar_etim(etim_prod, etim_dev)
@@ -216,6 +225,7 @@ def comparar_webs(url_prod, url_dev, termino_busqueda):
             "categorias": lista_categorias,
             "referencias": lista_referencias,
             "garantia": lista_garantia,
+            "masinfo": lista_masinfo,
             "etim": lista_etim,
             "caja": lista_compra,
             "menu": lista_menu,

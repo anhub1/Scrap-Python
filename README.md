@@ -1,6 +1,13 @@
 # Scrap-Python
 Proyecto scrap varias URL de productos EAN
 
+### [V1.0.3] Mas Info link - 2026-2-19
+- **Pruebas:** ✅ Todo ok.
+- **Pruebas:** ✅ Mostrar textos de menu de informacion adicional, debajo de categorías: `mas info`, `etim`, `datashet` que enlaza y salta a la información que hay al final de la página.
+- **Función:** Modificar función  `referencias`.
+- **Función:** Crear función  `masinfo`.
+- **HTML:** Visualizar  `masinfo`.
+
 ### [V1.0.2] Garantía Enlace - 2026-2-18
 - **Pruebas:** ✅ Todo ok.
 - **Pruebas:** ✅ Mostrar enlace de garantía y su link.

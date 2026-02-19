@@ -344,10 +344,10 @@ def extraer_garantia(soup, es_dev=False):
         # ----------------------- PROD -------------------------------------
         datos = []                                                                             # Lista
 
-        garantia_prod = soup.find('ul', id ='usefull_link_block')
+        masinfo_prod = soup.find('ul', id ='usefull_link_block')
 
-        if garantia_prod:  
-            items = garantia_prod.find_all('li')                #todos los li
+        if masinfo_prod:  
+            items = masinfo_prod.find_all('li')                #todos los li
             for li in items:
                 enlace = li.find('a')
                 if enlace:
@@ -363,11 +363,11 @@ def extraer_garantia(soup, es_dev=False):
         # ----------------------- DEV -------------------------------------
         datos = []                                                                             # Lista
 
-        garantia_dev = soup.find(attrs={'data-testid': 'usefull_link_block'})
+        masinfo_dev = soup.find(attrs={'data-testid': 'usefull_link_block'})
 
-        if garantia_dev:
-            texto = garantia_dev.get_text(strip=True)
-            enlace_url = garantia_dev.get('href', '')                  # Si no hay enlace mete vacío
+        if masinfo_dev:
+            texto = masinfo_dev.get_text(strip=True)
+            enlace_url = masinfo_dev.get('href', '')                  # Si no hay enlace mete vacío
             if texto:
                 datos.append({
                     "texto": texto, 
@@ -449,6 +449,115 @@ def comparar_garantia(prod, dev):
         """
     return resultados
 
+
+# ------------------------ ENLACE MAS INFO ------------------------------------------
+def extraer_masinfo(soup, es_dev=False):
+    if not es_dev:
+        # ----------------------- PROD -------------------------------------
+        datos = []                                                                             # Lista
+
+        masinfo_prod = soup.find('div', id ='subir')
+
+        if masinfo_prod:  
+            items = masinfo_prod.find_all('a')                #todos los li
+            for a in items:
+                texto = a.get_text(strip=True)
+                enlace_url = a.get('href', '')     # Si no hay enlace mete vacío: ' '
+                if texto:
+                    datos.append({
+                        "texto": texto, 
+                        "url": enlace_url
+                    })
+            
+    else:
+        # ----------------------- DEV -------------------------------------
+        datos = []                                                                             # Lista
+
+        masinfo_dev = soup.find(attrs={'data-testid': 'subir'})
+
+        if masinfo_dev:
+            texto = masinfo_dev.get_text(strip=True)
+            enlace_url = masinfo_dev.get('href', '')                  # Si no hay enlace mete vacío
+            if texto:
+                datos.append({
+                    "texto": texto, 
+                    "url": enlace_url
+                })
+
+    return datos
+
+def comparar_masinfo(prod, dev):
+    print("\n----------------- COMPARACIÓN DE MAS INFO ------------------------")
+    resultados = []
+    
+    if len(prod) == len(dev): 
+        print(f"✅ Mismo Nº de elementos ({len(prod)}).")
+    else:
+        print(f"❌ Diferencia: Prod tiene {len(prod)} y Dev tiene {len(dev)}.")
+        
+    cant_p = len(prod)
+    cant_d = len(dev)
+
+    maximo = max(cant_p, cant_d)   # Hay que coger la categoría con más filas
+    
+    
+    if cant_p == cant_d:
+        estado = "✅ OK"
+    else:
+        estado = "❌ ERROR"
+        
+    resultados.append({                        # Guardar en la lista para el HTML
+            "indice": "TOTAL",
+            "texto_p": cant_p,
+            "url_p": "--",
+            "texto_d": cant_d,
+            "url_d": "--",
+            "estado": estado
+        })    
+    #-----------------------------------------------------------------------
+    
+    nombres_p = prod        # Si pongo: [:5] => Máximo 5 para comparar
+    nombres_d = dev
+    
+    for i in range(maximo):                      # Usamos el largo de PROD para iterar (fila a fila)
+        if i < cant_p:
+            info_p = nombres_p[i]
+            texto_p = str(info_p.get("texto", "N/A")).strip()
+            url_p = str(info_p.get('url', 'N/A')).strip()
+        else:
+            texto_p = "N/A"
+            url_p = "N/A"
+            
+        if i < cant_d:
+            info_d = nombres_d[i]
+            texto_d = str(info_d.get("texto", "N/A")).strip()
+            url_d = str(info_d.get('url', 'N/A')).strip()
+        else:
+            texto_d = "N/A"
+            url_d = "N/A"    
+        
+        if texto_p == texto_d and url_p == url_d:       # Si coinciden texto y URL
+            estado = "✅ OK"
+        else:
+            estado = "❌ ERROR"
+            
+        
+        resultados.append({                        # Guardar en la lista para el HTML
+            "indice": i+1,
+            "texto_p": texto_p,
+            "url_p": url_p,
+            "texto_d": texto_d,
+            "url_d": url_d,
+            "estado": estado
+        })
+        """
+        # Print por consola
+        print(f"{estado} | Fila {i+1}:")
+        print(f"      PROD: {texto_p} -> {url_p}")
+        print(f"      DEV:  {texto_d} -> {url_d}")
+        print("-" * 30)
+        """
+    return resultados
 
 
 # ------------------------ ETIM   TABLA ------------------------------------------
